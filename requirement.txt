@@ -1,2 +1,4 @@
 sanic
 aiohttp
+pyyaml
+jinja2

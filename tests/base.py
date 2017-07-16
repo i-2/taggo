@@ -1,5 +1,6 @@
 """tests base file"""
 
+import asyncio
 from unittest.mock import Mock
 
 class AsyncMock(Mock):   
@@ -21,4 +22,12 @@ class EmptyAsyncMock(Mock):
         return coro()
 
     def __await__(self):
-        return self().__await__()
+        return self().__await__
+        
+
+def async_test(f):
+    loop = asyncio.get_event_loop()
+    def inner(*args, **kwargs):
+        result = loop.run_until_complete(f(*args, **kwargs))
+        return result
+    return inner
