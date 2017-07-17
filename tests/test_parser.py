@@ -3,6 +3,7 @@
 import asyncio
 import unittest
 from unittest.mock import patch
+from .base import AsyncMock
 from parsers import YamlCommand
 
 YAML = """
@@ -44,7 +45,18 @@ class TestYamlCommand(unittest.TestCase):
         input_sent = "track order1231231"
         command = YamlCommand(**self.command_dict)
         self.assertFalse(command.is_matched(input_sent))
-        
-    @asyncio.coroutine
-    def test_hello(self):
-        self.assertTrue(True)
+       
+    def test_parser(self):
+        input_sent = "track order 12312312"
+        command = YamlCommand(**self.command_dict)
+        self.assertDictEqual({
+            "track": "12312312"
+        }, command.parse(input_sent))
+
+    @patch.object(YamlCommand, '_send', new_callable=AsyncMock)
+    @asyncio.coroutine        
+    def test_execute(self, send_mock):
+        input_sent = "track order 123123213"
+        command = YamlCommand(**self.command_dict)
+        value = yield from command.execute(input_sent, sender_id=2342433)
+        self.assertFalse(send_mock.called)

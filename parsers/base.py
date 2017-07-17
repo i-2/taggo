@@ -26,6 +26,7 @@ import yaml
 import json
 import aiohttp
 import logging
+import inspect
 from jinja2 import Template
 
 logging.basicConfig(level=logging.INFO)
@@ -105,7 +106,10 @@ class YamlCommand(object):
                                           payload=payload)
             _template = Template(self.text_template)
             message = _template.render(response=response)
-            reply = await send_facebook_message(sender_id, message)
+            if inspect.iscoroutinefunction(self.send):
+                reply = await self.send(sender_id, message)
+            else:
+                reply = self.send(sender_id, message)
             return reply
         return None
         
@@ -113,8 +117,11 @@ class YamlCommand(object):
         """Parses the message and returns a dictionary
         of data's we are looking for"""
         parsed_content = {}
+        match = self.pattern.match(msg)
+        if not match:
+            return None
         for key in self.params:
-            parsed_content[key] = self.pattern.group(key)
+            parsed_content[key] = match.group(key)
         return parsed_content
 
     async def execute(self, msg, sender_id=None):
@@ -124,9 +131,11 @@ class YamlCommand(object):
             return reply
         else:
             return None
-            
+  
 class YamlExecutor(object):
     
+    command_class = YamlCommand
+
     def __init__(self, yaml_content):
         self.content = yaml.load(yaml_content)
         self._raw = yaml_content
@@ -137,28 +146,28 @@ class YamlExecutor(object):
             self.commands.append(self._parse_command(command_dict))
     
     def _parse_command(self, command_dict):
-        return YamlCommand(command_dict.get("name"),
+        return self.command_class(command_dict.get("name"),
                            command_dict.get("pattern"),
                            webhook=command_dict.get("webhook"),
                            method=command_dict.get("method", "GET"),
                            response_type=command_dict.get("type", "json"),
                            text=command_dict.get("text", ""),
                            params=tuple(command_dict.get("params",())))
-    
+
     @classmethod
     async def from_url(cls, url):
         response = await make_request(url, content_type="text")
         return cls(response)
-    
+
     @classmethod
     async def from_file(cls, f):
         content = f.read()
         return cls(content)
         
-    def respond(self, sender_id, msg):
+    async def respond(self, sender_id, msg):
         fil_gen = filter(lambda x: x.is_matched(msg), self.commands)
         matched = next(fil_gen)
         if matched:
-            return matched.execute(msg, sender_id=sender_id)
+            return await matched.execute(msg, sender_id=sender_id)
         else:
-            return self.default_command.execute(msg, sender_id=sender_id)
+            return await self.default_command.execute(msg, sender_id=sender_id)
