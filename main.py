@@ -5,7 +5,7 @@ from sanic import Sanic
 from parsers import FacebookYamlExecutor
 from endpoints import fb
 
-app = Sanic()
+app = Sanic('taggo')
 app.blueprint(fb)
 
 @app.listener('before_server_start')
