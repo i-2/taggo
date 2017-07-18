@@ -2,3 +2,5 @@
 venv/
 .vscode
 .c9
+*.log
+__pycache__

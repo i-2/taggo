@@ -160,7 +160,7 @@ class YamlExecutor(object):
         return cls(response)
 
     @classmethod
-    async def from_file(cls, f):
+    def from_file(cls, f):
         content = f.read()
         return cls(content)
         
