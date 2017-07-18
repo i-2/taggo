@@ -12,5 +12,5 @@ app.blueprint(fb)
 async def get_global_app_config(app, loop):
     app.executor = await FacebookYamlExecutor.from_url(os.environ.get("YAML_URL"))
 
-if __name__ == "__main__":
-    app.run(port=int(os.environ.get("PORT")), host=os.environ.get("IP"), workers=4)
+
+app.run(port=int(os.environ.get("PORT")), host=os.environ.get("IP"))

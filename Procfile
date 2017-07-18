@@ -1,1 +1,1 @@
-web: python -m sanic main.app --port=$PORT
+web: python -m sanic main.app
