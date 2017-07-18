@@ -26,7 +26,7 @@ async def recieve_message(request):
 @fb.get("/recieve_message")
 async def ping_pong(request):
     if request.raw_args.get("hub.verify_token") == VERIFY_TOKEN:
-        return text(request.raw_args.get("hub.verify_token"))
+        return text(request.raw_args.get("hub.challenge"))
     else:
         return text("Error")
 
