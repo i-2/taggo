@@ -4,3 +4,4 @@ venv/
 .c9
 *.log
 __pycache__
+*.env
