@@ -18,7 +18,8 @@ async def recieve_message(request):
                     sender_id = messaging_event["sender"]["id"]        
                     recipient_id = messaging_event["recipient"]["id"]  
                     message_text = messaging_event["message"]["text"]  
-                    reply = await request.app.command.execute(message_text, sender_id=sender_id) 
+                    executor = request.app.config["command"]
+                    reply = await executor.execute(message_text, sender_id=sender_id) 
     return json({
         "reply": "success"
     })

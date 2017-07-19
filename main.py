@@ -10,7 +10,8 @@ app.blueprint(fb)
 
 @app.listener('before_server_start')
 async def get_global_app_config(app, loop):
-    app.executor = await FacebookYamlExecutor.from_url(os.environ.get("YAML_URL"))
+    executor = await FacebookYamlExecutor.from_url(os.environ.get("YAML_URL"))
+    app.config.update({"command": executor})
 
 
 app.run(port=int(os.environ.get("PORT")), host=os.environ.get("IP"))
