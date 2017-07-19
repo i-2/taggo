@@ -110,7 +110,8 @@ class YamlCommand(object):
         if self.webhook_url:
             response = await make_request(self.webhook_url,
                                           method=self.method,
-                                          payload=payload)
+                                          payload=payload,
+                                          content_type=self.response_type)
         _template = Template(self.text_template)
         message = _template.render(response=response)
         if inspect.iscoroutinefunction(self.send):
