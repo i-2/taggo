@@ -60,12 +60,12 @@ requests:
        - track
 ```
 
-**name**: Name of the action.
-**pattern**: A regex pattern to match the particular action.
-**webhook**: A webhook which can be initiated when the message is recived.
-**method**: Method assosiated with the webhook
-**text**: Text to which it can be replyed with.
-**params**: Parameters which will sent along the request to webhook url. Taken 
+* **name**: Name of the action.
+* **pattern**: A regex pattern to match the particular action.
+* **webhook**: A webhook which can be initiated when the message is recived.
+* **method**: Method assosiated with the webhook
+* **text**: Text to which it can be replyed with.
+* **params**: Parameters which will sent along the request to webhook url. Taken 
 from the named groups in pattern.
 
 ## License
