@@ -142,9 +142,11 @@ class YamlExecutor(object):
         self.commands = []
         self.requests = self.content.get("requests", [])
         self.default_command = self._parse_command(self.content.get("default", {}))
+        logger.info(self._raw)
         for command_dict in self.requests:
+            logger.info(command_dict)
             self.commands.append(self._parse_command(command_dict))
-    
+ 
     def _parse_command(self, command_dict):
         return self.command_class(command_dict.get("name"),
                            command_dict.get("pattern"),
@@ -167,6 +169,7 @@ class YamlExecutor(object):
     async def respond(self, sender_id, msg):
         fil_gen = filter(lambda x: x.is_matched(msg), self.commands)
         matched = next(fil_gen)
+        logger.info(getattr(matched, 'name', 'None'))
         if matched:
             return await matched.execute(msg, sender_id=sender_id)
         else:
