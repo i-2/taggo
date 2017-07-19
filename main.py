@@ -14,4 +14,4 @@ async def get_global_app_config(app, loop):
     app.config.update({"command": executor})
 
 
-app.run(port=int(os.environ.get("PORT")), host=os.environ.get("IP"))
+app.run(port=int(os.environ.get("PORT", 8080)), host=os.environ.get("IP", "0.0.0.0"))

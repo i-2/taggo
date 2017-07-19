@@ -64,19 +64,25 @@ async def make_request(url,
     async with aiohttp.ClientSession(loop=loop) as session:
         _method_attr = getattr(session, method.lower())
         _kwargs = {"params" if method.lower() == "get" else "data": payload}
+        if content_type == "json":
+            _kwargs.update({
+                "headers": {"Content-Type": "application/json"} 
+            })
         async with _method_attr(url, **_kwargs) as resp:
-            json_response = await getattr(resp, RESPONSE_MIME_TYPES.get(content_type, "text"))()
-            return json_response
+            response = await getattr(resp, RESPONSE_MIME_TYPES.get(content_type, "text"))()
+            return response
 
 
-async def send_facebook_message(sender_id, message):
+async def send_facebook_message(message, sender_id):
     """Send the message to the particular id"""
-    reply = await make_request(FACEBOOK_ACCESS_ENDPOINT, 
-                               method="POST", payload={"recipient": {
+    payload = {"recipient": {
                                    "id": sender_id
                                }, "message": {
                                    "text": message
-                               }})
+                               }}
+    logger.info(payload)
+    reply = await make_request(FACEBOOK_ACCESS_ENDPOINT,
+                               method="POST", payload=json.dumps(payload))
     return reply
 
 class YamlCommand(object):
@@ -97,21 +103,21 @@ class YamlCommand(object):
         
     async def _send(self, data, sender_id=None):
         """await for request from webhook"""
+        payload = {}
+        for key in self.params:
+            payload[key] = data.get(key)
+        response = None
         if self.webhook_url:
-            payload = {}
-            for key in self.params:
-                payload[key] = data.get(key)
             response = await make_request(self.webhook_url,
                                           method=self.method,
                                           payload=payload)
-            _template = Template(self.text_template)
-            message = _template.render(response=response)
-            if inspect.iscoroutinefunction(self.send):
-                reply = await self.send(sender_id, message)
-            else:
-                reply = self.send(sender_id, message)
-            return reply
-        return None
+        _template = Template(self.text_template)
+        message = _template.render(response=response)
+        if inspect.iscoroutinefunction(self.send):
+            reply = await self.send(message, sender_id)
+        else:
+            reply = self.send(message, sender_id)
+        return reply
         
     def parse(self, msg):
         """Parses the message and returns a dictionary
@@ -168,9 +174,12 @@ class YamlExecutor(object):
         
     async def respond(self, sender_id, msg):
         fil_gen = filter(lambda x: x.is_matched(msg), self.commands)
-        matched = next(fil_gen)
-        logger.info(getattr(matched, 'name', 'None'))
-        if matched:
-            return await matched.execute(msg, sender_id=sender_id)
-        else:
+        try:
+            matched = next(fil_gen)
+            logger.info(getattr(matched, 'name', 'None'))
+            if matched:
+                return await matched.execute(msg, sender_id=sender_id)
+            else:
+                return await self.default_command.execute(msg, sender_id=sender_id)
+        except StopIteration:
             return await self.default_command.execute(msg, sender_id=sender_id)
