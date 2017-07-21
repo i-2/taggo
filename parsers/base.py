@@ -89,14 +89,15 @@ class YamlCommand(object):
     
     def __init__(self, name, pattern,
                        webhook=None, method="GET",
-                       response_type="json", text="", params=()):
+                       response_type="json", text="", params=(), ignore_case=True):
         self.name = name
         self.pattern = re.compile(pattern)
         self.webhook_url = webhook
         self.method = method
         self.response_type = response_type
-        self.text_template = text
         self.params = params
+        self.ignore_case = ignore_case
+        self.text_template = text.lower() if self.ignore_case else text
         
         
     def is_matched(self, msg):
@@ -162,7 +163,8 @@ class YamlExecutor(object):
                            method=command_dict.get("method", "GET"),
                            response_type=command_dict.get("type", "json"),
                            text=command_dict.get("text", ""),
-                           params=tuple(command_dict.get("params",())))
+                           params=tuple(command_dict.get("params",())),
+                           ignore_case=command_dict.get("ignorecase", True))
 
     @classmethod
     async def from_url(cls, url):
