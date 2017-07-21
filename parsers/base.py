@@ -97,11 +97,12 @@ class YamlCommand(object):
         self.response_type = response_type
         self.params = params
         self.ignore_case = ignore_case
-        self.text_template = text.lower() if self.ignore_case else text
+        self.text_template = text
         
         
     def is_matched(self, msg):
-        return True if self.pattern.match(msg) else False
+        message = msg.lower() if self.ignore_case else msg
+        return True if self.pattern.match(message) else False
         
     async def _send(self, data, sender_id=None):
         """await for request from webhook"""
