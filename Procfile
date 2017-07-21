@@ -1,1 +1,1 @@
-web: python -m sanic main.app
+web: python main.py
