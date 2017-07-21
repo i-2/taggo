@@ -98,6 +98,7 @@ class YamlCommand(object):
         self.text_template = text
         self.params = params
         
+        
     def is_matched(self, msg):
         return True if self.pattern.match(msg) else False
         

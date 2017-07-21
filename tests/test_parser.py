@@ -10,7 +10,7 @@ YAML = """
 
 default:
   name: default
-  patter: ".*"
+  pattern: ".*"
   text: can't get you
 
 requests:
@@ -20,7 +20,7 @@ requests:
     text: hello
   
   - name: order tracking
-    pattern: (track\s+order\s+(?P<track>.*)?
+    pattern: track\s+order\s+(?P<track>.*)?
     webhook: http://api.helloworld.com
     text: your order infomation {{response.description}}
     params: 
