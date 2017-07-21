@@ -3,14 +3,19 @@
 import asyncio
 import unittest
 from unittest.mock import patch
-from .base import AsyncMock
-from parsers import YamlCommand
+from .base import AsyncMock, AioTestCase
+from parsers import YamlCommand, YamlExecutor
 
 YAML = """
 
+default:
+  name: default
+  patter: ".*"
+  text: can't get you
+
 requests:
   - name: sayhello
-    pattern: hello
+    pattern: "hello"
     webhook: http://api.hello.com
     text: hello
   
@@ -24,7 +29,7 @@ requests:
 """
 
 
-class TestYamlCommand(unittest.TestCase):
+class TestYamlCommand(AioTestCase):
     
     def setUp(self):
         """setup the initial command dict"""
@@ -53,10 +58,41 @@ class TestYamlCommand(unittest.TestCase):
             "track": "12312312"
         }, command.parse(input_sent))
 
-    @patch.object(YamlCommand, '_send', new_callable=AsyncMock)
-    @asyncio.coroutine        
-    def test_execute(self, send_mock):
+    async def test_execute(self):
         input_sent = "track order 123123213"
-        command = YamlCommand(**self.command_dict)
-        value = yield from command.execute(input_sent, sender_id=2342433)
-        self.assertFalse(send_mock.called)
+        with patch.object(YamlCommand, '_send', new_callable=AsyncMock) as send_mock:
+            command = YamlCommand(**self.command_dict)
+            value = await command.execute(input_sent, sender_id=2342433)
+        self.assertTrue(send_mock.called)
+        
+
+class TestYamlExecutor(AioTestCase):
+    
+    def setUp(self):
+        self._raw_yaml = YAML
+        
+        class TestYamlCommand(YamlCommand):
+            def send(self, *args):
+                return True
+        
+        class TestYamlExecutor(YamlExecutor):
+            command_class = TestYamlCommand
+        
+        self.YCommand = TestYamlCommand
+        self.YExecute = TestYamlExecutor
+        
+    async def test_respond_method(self):
+        """test the execution of respond method"""
+        
+        found = "hello"
+        not_found ="How are you!"
+        
+        executor = self.YExecute(self._raw_yaml)
+        executor.default_command  = AsyncMock(return_value=None)
+        executor.default_command.execute = dmock = AsyncMock(return_value=None)
+        
+        with patch.object(self.YCommand, 'execute', new_callable=AsyncMock) as cm:
+            await executor.respond("1213132", found)
+            self.assertTrue(cm.called)
+            await executor.respond("1213132", not_found)
+            self.assertTrue(dmock.called)

@@ -2,6 +2,29 @@
 
 import asyncio
 from unittest.mock import Mock
+from unittest import TestCase
+
+class AioTestCase(TestCase):
+
+    # noinspection PyPep8Naming
+    def __init__(self, methodName='runTest', loop=None):
+        self.loop = loop or asyncio.get_event_loop()
+        self._function_cache = {}
+        super(AioTestCase, self).__init__(methodName=methodName)
+
+    def coroutine_function_decorator(self, func):
+        def wrapper(*args, **kw):
+            return self.loop.run_until_complete(func(*args, **kw))
+        return wrapper
+
+    def __getattribute__(self, item):
+        attr = object.__getattribute__(self, item)
+        if asyncio.iscoroutinefunction(attr):
+            if item not in self._function_cache:
+                self._function_cache[item] = self.coroutine_function_decorator(attr)
+            return self._function_cache[item]
+        return attr
+
 
 class AsyncMock(Mock):   
     def __call__(self, *args, **kwargs):
@@ -26,8 +49,9 @@ class EmptyAsyncMock(Mock):
         
 
 def async_test(f):
-    loop = asyncio.get_event_loop()
-    def inner(*args, **kwargs):
-        result = loop.run_until_complete(f(*args, **kwargs))
-        return result
-    return inner
+    def wrapper(*args, **kwargs):
+        coro = asyncio.coroutine(f)
+        future = coro(*args, **kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(future)
+    return wrapper
