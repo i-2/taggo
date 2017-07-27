@@ -116,6 +116,7 @@ class YamlCommand(object):
                                           payload=payload,
                                           content_type=self.response_type)
         _template = Template(self.text_template)
+        logger.info(response)
         message = _template.render(response=response)
         if inspect.iscoroutinefunction(self.send):
             reply = await self.send(message, sender_id)
