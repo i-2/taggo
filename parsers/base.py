@@ -27,7 +27,7 @@ import json
 import aiohttp
 import logging
 import inspect
-from jinja2 import Template
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -73,13 +73,8 @@ async def make_request(url,
             return response
 
 
-async def send_facebook_message(message, sender_id):
+async def send_payload(payload):
     """Send the message to the particular id"""
-    payload = {"recipient": {
-                                   "id": sender_id
-                               }, "message": {
-                                   "text": message
-                               }}
     logger.info(payload)
     reply = await make_request(FACEBOOK_ACCESS_ENDPOINT,
                                method="POST", payload=json.dumps(payload))
@@ -89,7 +84,7 @@ class YamlCommand(object):
     
     def __init__(self, name, pattern,
                        webhook=None, method="GET",
-                       response_type="json", text="", params=(), ignore_case=True):
+                       response_type="json", response=None, params=(), ignore_case=True):
         self.name = name
         self.pattern = re.compile(pattern)
         self.webhook_url = webhook
@@ -97,9 +92,8 @@ class YamlCommand(object):
         self.response_type = response_type
         self.params = params
         self.ignore_case = ignore_case
-        self.text_template = text
-        
-        
+        self._response = response
+                
     def is_matched(self, msg):
         message = msg.lower() if self.ignore_case else msg
         return True if self.pattern.match(message) else False
@@ -115,14 +109,15 @@ class YamlCommand(object):
                                           method=self.method,
                                           payload=payload,
                                           content_type=self.response_type)
-        _template = Template(self.text_template)
-        logger.info(response)
-        message = _template.render(response=response)
+        # _template = Template(self.text_template)
+        # logger.info(response)
+        # message = _template.render(response=response)
         if inspect.iscoroutinefunction(self.send):
-            reply = await self.send(message, sender_id)
+            reply = await self.send(self._response, sender_id, webhook_response=response)
         else:
-            reply = self.send(message, sender_id)
+            reply = self.send(self._response, sender_id, webhook_response=response)
         return reply
+
         
     def parse(self, msg):
         """Parses the message and returns a dictionary
@@ -164,7 +159,7 @@ class YamlExecutor(object):
                            webhook=command_dict.get("webhook"),
                            method=command_dict.get("method", "GET"),
                            response_type=command_dict.get("type", "json"),
-                           text=command_dict.get("text", ""),
+                           response=command_dict.get("response", ""),
                            params=tuple(command_dict.get("params",())),
                            ignore_case=command_dict.get("ignorecase", True))
 
