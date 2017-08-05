@@ -77,7 +77,7 @@ class WebViewTemplate(TemplateResponse):
     TEMPLATE_TYPE = "generic"
 
     def render(self):
-        return self._response.get("elements", [])
+        return dict(elements=self._response.get("elements", []))
 
 
 class ListTemplate(WebViewTemplate):
@@ -89,11 +89,11 @@ def get_response(recipient, response):
     """get the appropriate response object"""
 
     _type = response.get("type")
-    _tt = response.get("template_type")
+    _tt = response.get("template_type", "generic")
 
     if _type == "text":
         return TextBotResponse(response, recipient)
-    elif  _tt == "template":
+    elif  _type == "template":
         if _tt == "generic":
             return WebViewTemplate(response, recipient)
         elif _tt == "list":

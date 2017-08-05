@@ -1,10 +1,6 @@
-
-import logging
+import logging as logger
 from .response import get_response, apply_template
 from .base import YamlCommand, YamlExecutor, send_payload
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 class FacebookCommand(YamlCommand):
     """Bot command for Facebook"""
@@ -13,6 +9,7 @@ class FacebookCommand(YamlCommand):
         """send data to respond"""
         applied_dict = apply_template(response_dict, response=webhook_response)
         payload_response = get_response(sender_id, applied_dict) 
+        logger.info(payload_response)
         res = await send_payload(payload_response)
         return res
 

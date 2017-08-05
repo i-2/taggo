@@ -7,14 +7,16 @@ requests:
     webhook: http://api.hello.com
     method: get
     type: json
-    text: hello
+    response:
+       text: hello
   
   - name: order tracking
     pattern: track\s+order\s+(?P<track>.*)?
     webhook: http://api.helloworld.com
     method: post
     type: json
-    text: your order infomation {{response.description}}
+    response:
+       text: your order infomation {{response.description}}
     params: 
        - track
 
@@ -25,12 +27,9 @@ import re
 import yaml
 import json
 import aiohttp
-import logging
+import logging as logger
 import inspect
 
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 FACEBOOK_ACCESS_ENDPOINT = "https://graph.facebook.com/v2.6/me/messages?access_token={}".format(os.environ.get("ACCESS_TOKEN"))
 RESPONSE_MIME_TYPES = {
@@ -152,7 +151,7 @@ class YamlExecutor(object):
         for command_dict in self.requests:
             logger.info(command_dict)
             self.commands.append(self._parse_command(command_dict))
- 
+
     def _parse_command(self, command_dict):
         return self.command_class(command_dict.get("name"),
                            command_dict.get("pattern"),
