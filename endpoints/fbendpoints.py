@@ -14,7 +14,10 @@ async def recieve_message(request):
     if data["object"] == "page":
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
-                if messaging_event.get("message"):  
+                msg = messaging_event.get("message")
+                if "attachments" in msg:
+                    break
+                if msg:
                     sender_id = messaging_event["sender"]["id"]        
                     recipient_id = messaging_event["recipient"]["id"]  
                     message_text = messaging_event["message"]["text"]  
