@@ -2,3 +2,4 @@ sanic
 aiohttp
 pyyaml
 jinja2
+raven

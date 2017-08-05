@@ -1,6 +1,9 @@
-import logging as logger
+import logging
 from .response import get_response, apply_template
-from .base import YamlCommand, YamlExecutor, send_payload
+from .base import YamlCommand, YamlExecutor
+from util.request import send_payload
+
+logger = logging.getLogger(__name__)
 
 class FacebookCommand(YamlCommand):
     """Bot command for Facebook"""

@@ -1,7 +1,7 @@
 """Facebook bot response class"""
 
 import json
-from .base import make_request, FACEBOOK_ACCESS_ENDPOINT
+from util.request import make_request, FACEBOOK_ACCESS_ENDPOINT
 from jinja2 import Template
 
 
