@@ -22,7 +22,6 @@ or
 # run the main script
 python main.py
 
-
 ```
 
 ## Environmental Variables:

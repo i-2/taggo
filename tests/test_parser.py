@@ -15,16 +15,19 @@ default:
 
 requests:
   - name: sayhello
-    pattern: "hello"
-    webhook: http://api.hello.com
-    text: hello
+    pattern: hello
+    response:
+       type: text
+       text: hello
   
   - name: order tracking
     pattern: track\s+order\s+(?P<track>.*)?
     webhook: http://api.helloworld.com
-    text: your order infomation {{response.description}}
     params: 
        - track
+    response:
+       type: text
+       text: your order infomation {{response.description}}
 
 """
 
@@ -37,8 +40,11 @@ class TestYamlCommand(AioTestCase):
             "name": "sayhello",
             "pattern": "track\s+order\s+(?P<track>.*)?",
             "webhook": "http://api.helloworld.com",
-            "text": "your order information {{response.description}}",
-            "params": ("track",)
+            "params": ("track",),
+            "response": {
+                "type": "text",
+                "text": "your order information {{response.description}}",
+            }
         }
     
     def test_must_produce_matching_result(self):
