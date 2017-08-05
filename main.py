@@ -13,5 +13,5 @@ async def get_global_app_config(app, loop):
     executor = await FacebookYamlExecutor.from_url(os.environ.get("YAML_URL"))
     app.config.update({"command": executor})
 
-
-app.run(port=int(os.environ.get("PORT", 8080)), host=os.environ.get("IP", "0.0.0.0"))
+if __name__ == "__main__":
+    app.run(port=int(os.environ.get("PORT", 8080)), host=os.environ.get("IP", "0.0.0.0"))
