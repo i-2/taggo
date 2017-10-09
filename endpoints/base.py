@@ -15,7 +15,7 @@ class FacebookResponse(object):
 
         for entry in self.entries:
             for messaging_event in entry["messaging"]:
-                msg = messaging_event.get("message")
+                msg = messaging_event.get("message", {})
                 if "attachments" in msg:
                     break
                 if msg:
