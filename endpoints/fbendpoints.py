@@ -3,6 +3,7 @@
 import os
 from sanic.response import json, text
 from sanic import Blueprint
+from .base import FacebookResponse
 from parsers import FacebookYamlExecutor
 
 VERIFY_TOKEN = os.environ.get("VF_TOKEN")
@@ -10,19 +11,11 @@ fb = Blueprint('facebook', url_prefix="/fb")
 
 @fb.post('/recieve_message')
 async def recieve_message(request):
-    data = request.json
-    if data["object"] == "page":
-        for entry in data["entry"]:
-            for messaging_event in entry["messaging"]:
-                msg = messaging_event.get("message")
-                if "attachments" in msg:
-                    break
-                if msg:
-                    sender_id = messaging_event["sender"]["id"]        
-                    recipient_id = messaging_event["recipient"]["id"]  
-                    message_text = messaging_event["message"]["text"]  
-                    executor = request.app.config["command"]
-                    reply = await executor.respond(sender_id, message_text) 
+    data = request.json 
+    fb_resp = FacebookResponse(page_type=data["object"],
+                               entries=data.get("entry"),
+                               executor=request.app.config["command"])
+    await fb_resp.send()
     return json({
         "reply": "success"
     })
