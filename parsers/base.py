@@ -63,9 +63,6 @@ class YamlCommand(object):
                                           method=self.method,
                                           payload=payload,
                                           content_type=self.response_type)
-        # _template = Template(self.text_template)
-        # logger.info(response)
-        # message = _template.render(response=response)
         if inspect.iscoroutinefunction(self.send):
             reply = await self.send(self._response, sender_id, webhook_response=response)
         else:
