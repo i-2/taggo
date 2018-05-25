@@ -24,4 +24,5 @@ async def get_global_app_config(app, loop):
 if __name__ == "__main__":
     app.run(port=int(os.environ.get("PORT", 8080)), 
             host=os.environ.get("IP", "0.0.0.0"),
-            debug=False)
+            debug=False,
+            workers=4)
