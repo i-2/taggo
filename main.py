@@ -22,7 +22,7 @@ from endpoints import fb
 
 app = Sanic('taggo')
 app.blueprint(fb)
-client = Client(os.environ.get("sentry"))
+client = Client(os.environ.get("SENTRY"))
 log_handler = SentryHandler(client)
 log_handler.setLevel(logging.ERROR)
 setup_logging(log_handler)
