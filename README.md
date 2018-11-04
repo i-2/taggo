@@ -13,16 +13,9 @@ git clone https://github.com/vttach/taggo.git
 # change to cloned directory
 cd taggo/
 
-# Install all the dependencies
-pip install -r requirements.txt
+python setup.py install
 
-# run the wsgi server
-python -m sanic main.app
-
-or 
-
-# run the main script
-python main.py
+taggo  # Run taggo
 
 ```
 
