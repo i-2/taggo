@@ -4,7 +4,7 @@ import asyncio
 import unittest
 from unittest.mock import patch
 from .base import AsyncMock, AioTestCase
-from parsers import YamlCommand, YamlExecutor
+from taggo.parsers import YamlCommand, YamlExecutor
 
 YAML = """
 

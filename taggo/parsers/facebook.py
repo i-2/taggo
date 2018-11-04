@@ -2,7 +2,7 @@ import logging
 from .response.base import apply_template
 from .response.facebook import get_response
 from .base import YamlCommand, YamlExecutor
-from util.request import send_payload
+from taggo.util.request import send_payload
 
 logger = logging.getLogger(__name__)
 

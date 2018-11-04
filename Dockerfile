@@ -7,6 +7,6 @@ ENV YAML_URL= \
 
 WORKDIR /app
 COPY . /app
-RUN pip install -r requirements.txt
-
-ENTRYPOINT [ "python" , "-m", "sanic", "main.app", "--worker", "4", "--host", "0.0.0.0"]
+RUN python setup.py install
+EXPOSE 8080
+ENTRYPOINT [ "taggo" ]

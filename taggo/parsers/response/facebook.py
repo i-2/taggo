@@ -1,7 +1,7 @@
 """Response template for facebook bots"""
 
 import json
-from util.request import make_request, FACEBOOK_ACCESS_ENDPOINT
+from taggo.util.request import make_request, FACEBOOK_ACCESS_ENDPOINT
 
 class FacebookBotResponse(dict):
     """responding to facebook bot"""

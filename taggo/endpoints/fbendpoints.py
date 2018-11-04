@@ -4,7 +4,7 @@ import os
 from sanic.response import json, text
 from sanic import Blueprint
 from .base import FacebookResponse
-from parsers import FacebookYamlExecutor
+from taggo.parsers import FacebookYamlExecutor
 
 VERIFY_TOKEN = os.environ.get("VF_TOKEN")
 fb = Blueprint('facebook', url_prefix="/fb")

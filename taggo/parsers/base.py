@@ -29,7 +29,7 @@ import json
 import aiohttp
 import logging
 import inspect
-from util.request import make_request
+from taggo.util.request import make_request
 
 logger = logging.getLogger(__name__)
 

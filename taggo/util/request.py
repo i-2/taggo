@@ -40,7 +40,7 @@ async def make_request(url,
             _kwargs.update({
                 "headers": {"Content-Type": "application/json"} 
             })
-        async with _method_attr(url, **_kwargs) as resp:
+        async with _method_attr(url, verify_ssl=False, **_kwargs) as resp:
             response = await getattr(resp, RESPONSE_MIME_TYPES.get(content_type, "text"))()
             return response
 
